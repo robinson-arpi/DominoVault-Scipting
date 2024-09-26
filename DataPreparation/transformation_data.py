@@ -60,6 +60,11 @@ def transformar_datos(df, field_names):
     
     return pd.DataFrame(rows)
 
+def preprocesed_versions(df):
+    # Supongamos que tu DataFrame se llama df
+    return df.sort_values(by='$REF', ascending=False)
+
+
 def analizar_archivo(dpath_carpeta, carpeta_nombre):
     archivo_csv = os.path.join(dpath_carpeta, "documents_info.csv")
     
@@ -96,10 +101,10 @@ def analizar_archivo(dpath_carpeta, carpeta_nombre):
     transformed_data = transformed_data.apply(lambda col: col.str.replace('"', '') if col.dtype == 'object' else col)
     # Eliminar columnas vacías (sin datos)
     transformed_data = transformed_data.dropna(axis=1, how='all')
-
+    transformed_data = preprocesed_versions(transformed_data)
     # Guardar los datos transformados en un nuevo archivo CSV
     output_csv = os.path.join(dpath_carpeta, "transformed_data.csv")
-    transformed_data.to_csv(output_csv, index=False)
+    transformed_data.to_csv(output_csv, index=True)
     print(f"Datos transformados guardados en '{output_csv}'.")
 
 # Ejemplo de uso
