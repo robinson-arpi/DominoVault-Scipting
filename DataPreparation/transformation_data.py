@@ -65,6 +65,48 @@ def preprocesed_versions(df):
     return df.sort_values(by='$REF', ascending=False)
 
 
+def rename_duplicates(df, column):
+    # Diccionario para contar cuántas veces aparece cada archivo (normalizado)
+    file_count = {}
+    
+    # Iterar sobre cada ruta del archivo en la columna
+    for i, file_path in enumerate(df[column]):
+        # Verificar si el valor no es None o NaN
+        if pd.isna(file_path):
+            continue  # Saltar esta iteración si el valor es None o NaN
+        
+        # Obtener el directorio y el nombre de archivo con extensión
+        directory, filename = os.path.split(file_path)
+        file_base, file_ext = os.path.splitext(filename)
+
+        # Normalizamos el nombre de archivo a minúsculas para evitar colisiones
+        file_base_lower = file_base.lower()
+
+        # Verificar si el archivo (en minúsculas) ya apareció antes
+        if file_base_lower in file_count:
+            # Si es repetido, incrementar el contador y renombrar
+            file_count[file_base_lower] += 1
+            new_file_name = f"{file_base}_{file_count[file_base_lower]}{file_ext}"
+        else:
+            # Si es la primera vez que aparece, inicializar el contador
+            file_count[file_base_lower] = 0
+            new_file_name = filename
+
+        # Crear la nueva ruta con el nombre cambiado
+        new_file_path = os.path.join(directory, new_file_name)
+
+        # Verificar si el archivo original existe y es un archivo (no carpeta)
+        if os.path.isfile(file_path):
+            # Renombrar el archivo en el sistema de archivos
+            os.rename(file_path, new_file_path)
+            
+            # Actualizar el DataFrame con la nueva ruta
+            df.at[i, column] = new_file_path
+        else:
+            print(f"El archivo '{file_path}' no existe o no es un archivo.")
+
+    return df
+
 def analizar_archivo(dpath_carpeta, carpeta_nombre):
     archivo_csv = os.path.join(dpath_carpeta, "documents_info.csv")
     
@@ -101,7 +143,9 @@ def analizar_archivo(dpath_carpeta, carpeta_nombre):
     transformed_data = transformed_data.apply(lambda col: col.str.replace('"', '') if col.dtype == 'object' else col)
     # Eliminar columnas vacías (sin datos)
     transformed_data = transformed_data.dropna(axis=1, how='all')
-    transformed_data = preprocesed_versions(transformed_data)
+    # Renombrar  archivos  con igual nombre
+    transformed_data = rename_duplicates(transformed_data,"cmpAnexoProc")
+
     # Guardar los datos transformados en un nuevo archivo CSV
     output_csv = os.path.join(dpath_carpeta, "transformed_data.csv")
     transformed_data.to_csv(output_csv, index=True)
