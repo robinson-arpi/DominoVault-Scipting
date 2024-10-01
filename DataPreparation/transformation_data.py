@@ -2,30 +2,43 @@ import os
 import pandas as pd
 import re
 
-def verificar_directorio(path):
+def check_directory(path):
     """Verifica si el path existe y es un directorio."""
-    if not os.path.exists(path):
-        print(f"El directorio '{path}' no existe.")
+    try:
+        # Verifica si el path existe
+        if not os.path.exists(path):
+            print("\033[91mEl directorio '{}' no existe.\033[0m".format(path))
+            return False
+        # Verifica si el path es un directorio
+        if not os.path.isdir(path):
+            print("\033[91m'{}' no es un directorio.\033[0m".format(path))
+            return False
+        return True
+    except Exception as e:
+        # Captura e imprime cualquier error inesperado en rojo
+        print("\033[91mError: {}\033[0m".format(e))
         return False
-    if not os.path.isdir(path):
-        print(f"'{path}' no es un directorio.")
-        return False
-    return True
 
-def listar_carpetas(dpath):
+def review_directory(path):
     """Lista las carpetas en un directorio dado y analiza los archivos dentro de ellas."""
-    if not verificar_directorio(dpath):
+    # Verifica si el directorio es válido
+    if not check_directory(path):
         return
     
-    carpetas = [nombre for nombre in os.listdir(dpath) if os.path.isdir(os.path.join(dpath, nombre))]
+    # Obtiene una lista de nombres de carpetas en el directorio
+    folders = [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
     
-    if carpetas:
+    # Si se encontraron carpetas
+    if folders:
         print("Carpetas encontradas:")
-        for carpeta in carpetas:
-            print(f"\n- {carpeta}")
-            analizar_archivo(os.path.join(dpath, carpeta), carpeta)
+        for folder in folders:
+            # Imprime el nombre de la carpeta
+            print(f"\n- {folder}")
+            # Llama a la función para analizar archivos dentro de la carpeta
+            analizar_archivo(os.path.join(path, folder), folder)
     else:
-        print("No se encontraron carpetas.")
+        # Si no se encontraron carpetas, imprime un mensaje de error en rojo
+        print("\033[91mError: No se encontraron carpetas.\033[0m")
 
 def leer_csv(archivo_csv):
     """Lee un archivo CSV y maneja posibles errores."""
@@ -104,19 +117,32 @@ def rename_duplicates(df, column):
             df.at[i, column] = new_file_path
         else:
             print(f"El archivo '{file_path}' no existe o no es un archivo.")
-
     return df
 
-def analizar_archivo(dpath_carpeta, carpeta_nombre):
-    archivo_csv = os.path.join(dpath_carpeta, "documents_info.csv")
-    
+def delete_empty_folders(folder_path):
+    # Recorre las carpetas desde el nivel más profundo
+    for current_folder, subfolders, files in os.walk(folder_path, topdown=False):
+        # Si la carpeta está vacía (no contiene archivos ni subcarpetas)
+        if not subfolders and not files:
+            try:
+                os.rmdir(current_folder)  # Elimina la carpeta vacía
+            except OSError as e:
+                # Imprime en rojo si ocurre un error al eliminar la carpeta
+                print("\033[91mNo se pudo eliminar la carpeta {}: {}\033[0m".format(current_folder, e))
+    # Imprime en verde si la carpeta se eliminó correctamente
+    print("\033[92mCarpetas vacías eliminadas correctamente: {}\033[0m".format(current_folder))
+
+def analizar_archivo(path, carpeta_nombre):
+    delete_empty_folders(path)
+
+    archivo_csv = os.path.join(path, "documents_info.csv")
     if not os.path.isfile(archivo_csv):
-        print(f"No se encontró el archivo 'documents_info.csv' en {dpath_carpeta}.")
+        print(f"No se encontró el archivo 'documents_info.csv' en {path}.")
         return
     
     df = leer_csv(archivo_csv)
     if df is None or 'DocID' not in df.columns or 'FieldName' not in df.columns:
-        print(f"El archivo 'documents_info.csv' no contiene las columnas esperadas en {dpath_carpeta}.")
+        print(f"El archivo 'documents_info.csv' no contiene las columnas esperadas en {path}.")
         return
 
     # Obtener datos únicos
@@ -147,10 +173,10 @@ def analizar_archivo(dpath_carpeta, carpeta_nombre):
     transformed_data = rename_duplicates(transformed_data,"cmpAnexoProc")
 
     # Guardar los datos transformados en un nuevo archivo CSV
-    output_csv = os.path.join(dpath_carpeta, "transformed_data.csv")
-    transformed_data.to_csv(output_csv, index=True)
+    output_csv = os.path.join(path, "transformed_data.csv")
+    transformed_data.to_csv(output_csv)
     print(f"Datos transformados guardados en '{output_csv}'.")
 
 # Ejemplo de uso
-dpath = "C:/Users/robin/Desktop/Centrosur/RespaldoDomino/ProPru"
-listar_carpetas(dpath)
+path = "C:/Users/robin/Desktop/Centrosur/RespaldoDomino/ProPru"
+review_directory(path)
