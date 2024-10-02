@@ -1,4 +1,5 @@
 import os
+import shutil
 import pandas as pd
 import re
 
@@ -28,32 +29,32 @@ def review_directory(path):
     # Obtiene una lista de nombres de carpetas en el directorio
     folders = [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
     
-    # Si se encontraron carpetas
+    # Si se encontraron carpetas que corresponden a las bases de datos
     if folders:
         print("Carpetas encontradas:")
         for folder in folders:
             # Imprime el nombre de la carpeta
             print(f"\n- {folder}")
             # Llama a la función para analizar archivos dentro de la carpeta
-            analizar_archivo(os.path.join(path, folder), folder)
+            analyze_file(os.path.join(path, folder), folder)
     else:
         # Si no se encontraron carpetas, imprime un mensaje de error en rojo
         print("\033[91mError: No se encontraron carpetas.\033[0m")
 
-def leer_csv(archivo_csv):
+def read_csv(archive):
     """Lee un archivo CSV y maneja posibles errores."""
     try:
-        df = pd.read_csv(archivo_csv, on_bad_lines='skip', quoting=3, delimiter=',')
+        df = pd.read_csv(archive, on_bad_lines='skip', quoting=3, delimiter=',')
         return df
     except Exception as e:
-        print(f"Ocurrió un error al leer el archivo CSV: {e}")
+        print(f"\033[91mError al leer el archivo: {e}.\033[0m")
         return None
 
-def es_caracter_ileible(texto):
+def is_unreadable_character(text):
     """Determina si el texto contiene caracteres ilegibles."""
-    return not re.match(r'^[\x00-\x7F]*$', texto)
+    return not re.match(r'^[\x00-\x7F]*$', text)
 
-def transformar_datos(df, field_names):
+def data_transform(df, field_names):
     """Transforma los datos del DataFrame en un formato más estructurado."""
     rows = []
     for doc_id in df['DocID'].unique():
@@ -65,12 +66,12 @@ def transformar_datos(df, field_names):
             field_value = row.get('FieldValue', None)
             if field_name == 'cmpunidp':
                 continue
-            if pd.notna(field_value) and es_caracter_ileible(str(field_value)):
+            # Los caracteres ilegibles  corresponden a  casillas de verificación, para no perder la información, si existe algún caracter de estos el campo es reemplazado por 1
+            if pd.notna(field_value) and is_unreadable_character(str(field_value)):
                 new_row[field_name] = 1
             else:
                 new_row[field_name] = field_value
         rows.append(new_row)
-    
     return pd.DataFrame(rows)
 
 def preprocesed_versions(df):
@@ -110,13 +111,13 @@ def rename_duplicates(df, column):
 
         # Verificar si el archivo original existe y es un archivo (no carpeta)
         if os.path.isfile(file_path):
-            # Renombrar el archivo en el sistema de archivos
-            os.rename(file_path, new_file_path)
-            
-            # Actualizar el DataFrame con la nueva ruta
-            df.at[i, column] = new_file_path
+            if not os.path.exists(new_file_path):
+                # Crear archivo nueov con el nomrb eactualziado
+                shutil.copy(file_path, new_file_path)
+                # Actualizar el DataFrame con la nueva ruta
+                df.at[i, column] = new_file_path
         else:
-            print(f"El archivo '{file_path}' no existe o no es un archivo.")
+            print(f"\033[91mEl archivo no existe: {file_path}.\033[0m")
     return df
 
 def delete_empty_folders(folder_path):
@@ -132,29 +133,29 @@ def delete_empty_folders(folder_path):
     # Imprime en verde si la carpeta se eliminó correctamente
     print("\033[92mCarpetas vacías eliminadas correctamente: {}\033[0m".format(current_folder))
 
-def analizar_archivo(path, carpeta_nombre):
+def analyze_file(path, carpeta_nombre):
     delete_empty_folders(path)
 
-    archivo_csv = os.path.join(path, "documents_info.csv")
-    if not os.path.isfile(archivo_csv):
-        print(f"No se encontró el archivo 'documents_info.csv' en {path}.")
+    csv_archive = os.path.join(path, "documents_info.csv")
+    if not os.path.isfile(csv_archive):
+        print(f"\033[93mNo se encontró el archivo 'documents_info.csv' en {path}.\033[0m")
         return
     
-    df = leer_csv(archivo_csv)
+    df = read_csv(csv_archive)
     if df is None or 'DocID' not in df.columns or 'FieldName' not in df.columns:
-        print(f"El archivo 'documents_info.csv' no contiene las columnas esperadas en {path}.")
+        print(f"\033[93mEl archivo 'documents_info.csv' no contiene las columnas esperadas en {path}.\033[0m")
         return
 
     # Obtener datos únicos
-    doc_ids_unicos = df['DocID'].nunique()
+    unique_id_docs = df['DocID'].nunique()
     field_names = list(set(df['FieldName'].unique()))
     
     print(f"En la carpeta '{carpeta_nombre}':")
-    print(f"Cantidad de DocID únicos: {doc_ids_unicos}")
+    print(f"Cantidad de DocID únicos: {unique_id_docs}")
     print(f"Cantidad de FieldName únicos: {len(field_names)}")
     
     # Transformar los datos
-    transformed_data = transformar_datos(df, field_names)
+    transformed_data = data_transform(df, field_names)
     
     # Eliminar columna 'cmpunidp' si existe
     if 'cmpunidp' in transformed_data.columns:
@@ -173,9 +174,9 @@ def analizar_archivo(path, carpeta_nombre):
     transformed_data = rename_duplicates(transformed_data,"cmpAnexoProc")
 
     # Guardar los datos transformados en un nuevo archivo CSV
-    output_csv = os.path.join(path, "transformed_data.csv")
+    output_csv = os.path.join(path, "clean_data.csv")
     transformed_data.to_csv(output_csv)
-    print(f"Datos transformados guardados en '{output_csv}'.")
+    print(f"\033[92mDatos transformados guardados en '{output_csv}'.\033[0m")
 
 # Ejemplo de uso
 path = "C:/Users/robin/Desktop/Centrosur/RespaldoDomino/ProPru"
