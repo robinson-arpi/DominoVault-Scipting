@@ -272,7 +272,7 @@ def main():
 
             # Procesar el archivo CSV en la subcarpeta
             csv_file_path = os.path.join(folder_path, subfolder)
-            csv_name = "transformed_data.csv"
+            csv_name = "clean_data.csv"
             if os.path.exists(csv_file_path):
                 print(f"Processing CSV: {csv_file_path}")
                 process_csv_and_upload_attachments(csv_file_path, csv_name,id_subfolder)

@@ -88,7 +88,6 @@ def rename_duplicates(df, column):
         # Verificar si el valor no es None o NaN
         if pd.isna(file_path):
             continue  # Saltar esta iteración si el valor es None o NaN
-        
         # Obtener el directorio y el nombre de archivo con extensión
         directory, filename = os.path.split(file_path)
         file_base, file_ext = os.path.splitext(filename)
@@ -101,6 +100,7 @@ def rename_duplicates(df, column):
             # Si es repetido, incrementar el contador y renombrar
             file_count[file_base_lower] += 1
             new_file_name = f"{file_base}_{file_count[file_base_lower]}{file_ext}"
+            print(new_file_name)
         else:
             # Si es la primera vez que aparece, inicializar el contador
             file_count[file_base_lower] = 0
@@ -111,11 +111,13 @@ def rename_duplicates(df, column):
 
         # Verificar si el archivo original existe y es un archivo (no carpeta)
         if os.path.isfile(file_path):
-            if not os.path.exists(new_file_path):
-                # Crear archivo nueov con el nomrb eactualziado
-                shutil.copy(file_path, new_file_path)
+            if os.path.exists(new_file_path):
                 # Actualizar el DataFrame con la nueva ruta
                 df.at[i, column] = new_file_path
+                continue
+            else:
+                # Crear archivo nueov con el nomrb eactualziado
+                shutil.copy(file_path, new_file_path)
         else:
             print(f"\033[91mEl archivo no existe: {file_path}.\033[0m")
     return df
