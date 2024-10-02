@@ -5,7 +5,7 @@ import os
 import pandas as pd
 import  time
 # Datos de conexión
-alfresco_url = "http://172.19.154.129:8080/alfresco/api/-default-/public/alfresco/versions/1"
+alfresco_url = "http://172.19.154.72:8080/alfresco/api/-default-/public/alfresco/versions/1"
 alfresco_user = "admin"
 alfresco_password = "admin"
 
@@ -241,7 +241,7 @@ def process_csv_and_upload_attachments(csv_path, csv_name,  parent_id_alfresco):
             else:
                 print(f"Failed to upload: {file_path}\n")
     # Guardar el CSV actualizado en una ruta temporal
-    csv_actualizado = 'enlaced_data_to_alfresco.csv'
+    csv_actualizado = 'data_in_alfresco.csv'
     df.to_csv(os.path.join(csv_path, csv_actualizado), index=False)            
 
 # Función principal para ejecutar todo
