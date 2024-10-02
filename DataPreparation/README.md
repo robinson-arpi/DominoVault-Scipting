@@ -1,69 +1,78 @@
-# Script de Procesamiento de Archivos CSV
+# Script para Procesamiento de Archivos CSV
 
 Este script en Python está diseñado para procesar archivos CSV dentro de carpetas en un directorio específico. Realiza las siguientes tareas:
 
-1. **Verifica la existencia y validez del directorio**.
-2. **Lista las carpetas en el directorio especificado**.
-3. **Analiza los archivos CSV dentro de cada carpeta**:
-   - Lee el archivo `documents_info.csv`.
+1. **Verificación del directorio**: Asegura que el directorio especificado existe y es válido.
+2. **Listado de carpetas**: Muestra las carpetas dentro del directorio.
+3. **Análisis de archivos CSV**:
+   - Lee el archivo `documents_info.csv` en cada carpeta.
    - Filtra y transforma los datos:
-     - Elimina columnas que contengan el nombre `cmpunidp`.
+     - Elimina la columna `cmpunidp` si está presente.
      - Reemplaza el contenido de las celdas con caracteres ilegibles por el valor `1`.
-     - Elimina columnas vacías.
-   - Guarda los datos transformados en un nuevo archivo CSV llamado `transformed_data.csv`.
+     - Elimina las columnas vacías.
+     - Renombra archivos duplicados para evitar colisiones.
+   - Guarda los datos transformados en un nuevo archivo CSV llamado `clean_data.csv`.
 
 ## Requisitos
 
 - Python 3.x
-- Pandas (puede instalarse usando `pip install pandas`)
+- Instalar requirements.txt
 
 ## Uso
 
-1. **Configurar el Directorio**: Establece el valor de `dpath` con la ruta al directorio que contiene las carpetas a procesar.
+1. **Configurar el Directorio**: Cambia el valor de `path` en el script con la ruta al directorio que contiene las carpetas que deseas procesar:
 
    ```python
-   dpath = "C:/Users/robin/Desktop/Centrosur/RespaldoDomino/ProPru"
+   path = "C:/Users/robin/Desktop/Centrosur/RespaldoDomino/ProPru"
 
-2. **Ejecutar el Script**: Ejecuta el script de Python. El script recorrerá todas las carpetas en el directorio especificado y procesará los archivos documents_info.csv dentro de cada una.
+2. **Ejecutar el Script**: Ejecuta el script de Python en la terminal o desde un entorno de desarrollo:
 
-python tranformatio_data.py
+
+   ```python
+   clean_data.py
+El script recorrerá todas las carpetas en el directorio especificado y procesará los archivos documents_info.csv dentro de cada una.
 
 
 ## Funcionamiento Detallado
 
 ### Funciones Principales
 
-- **`verificar_directorio(path)`**:
-  - Verifica si el `path` existe y si es un directorio.
+- **`check_directory(path)`**:
+  - Verifica si el path existe y si es un directorio.
   - Imprime un mensaje de error si el directorio no existe o no es válido.
 
-- **`listar_carpetas(dpath)`**:
+- **`review_directory(path)`**:
   - Lista todas las carpetas en el directorio dado.
-  - Llama a `analizar_archivo` para cada carpeta encontrada.
+  - Llama a analyze_file para procesar los archivos CSV dentro de cada carpeta.
 
-- **`leer_csv(archivo_csv)`**:
+- **`read_csv(archive)`**:
   - Lee un archivo CSV usando Pandas.
-  - Maneja posibles errores al leer el archivo.
+  - Maneja errores durante la lectura, como archivos corruptos o con formato incorrecto.
 
-- **`es_caracter_ileible(texto)`**:
-  - Determina si el texto contiene caracteres ilegibles usando una expresión regular.
+- **`is_unreadable_character(text)`**:
+  - Determina si un texto contiene caracteres ilegibles usando una expresión regular.
 
-- **`transformar_datos(df, field_names)`**:
+- **`data_transform(df, field_names)`**:
   - Transforma los datos en el DataFrame:
-    - Elimina columnas con el nombre `cmpunidp`.
-    - Reemplaza el contenido de celdas con caracteres ilegibles por `1` (como en el caso de las columnas Check para el Scanned).
-    - Reordena las columnas para que `DocID` sea la primera.
+  - Elimina la columna cmpunidp si está presente.
+  - Reemplaza celdas con caracteres ilegibles por el valor 1.
+  - Reordena las columnas para que DocID sea la primera.
 
-- **`analizar_archivo(dpath_carpeta, carpeta_nombre)`**:
-  - Analiza el archivo `documents_info.csv` en la carpeta dada:
-    - Lee el archivo CSV.
-    - Transforma los datos usando `transformar_datos`.
-    - Elimina columnas vacías.
-    - Guarda los datos transformados en un nuevo archivo CSV llamado `transformed_data.csv`.
+- **`rename_duplicates(df, column)`**:
+  - Renombra archivos con nombres duplicados dentro del DataFrame para evitar conflictos de nombres.
 
+- **`analyze_file(path, carpeta_nombre)`**:
+  - Analiza el archivo documents_info.csv en la carpeta dada:
+  - Lee el archivo CSV.
+  - Transforma los datos con data_transform.
+  - Elimina columnas vacías.
+  - Guarda los datos transformados en un archivo llamado clean_data.csv.
+
+- **`delete_empty_folders(folder_path)`**:
+  - Elimina carpetas vacías dentro de un directorio.
 
 ## Notas Adicionales
 Asegúrate de que todas las carpetas en el directorio especificado contengan archivos documents_info.csv para que el script funcione correctamente.
-El script asume que el archivo CSV contiene las columnas DocID, FieldName, y FieldValue.
+El script asume que el archivo CSV contiene las columnas `DocID`, `FieldName`, y `FieldValue`.
 
-Si tienes alguna pregunta o encuentras algún problema, no dudes en abrir un issue o contactarme
+Si tienes alguna pregunta o encuentras algún problema, no dudes en abrir un issue o contactarme  
