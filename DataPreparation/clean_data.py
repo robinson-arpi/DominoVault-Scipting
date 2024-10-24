@@ -2,6 +2,11 @@ import os
 import shutil
 import pandas as pd
 import re
+import sys
+
+# Añadir la carpeta raíz del proyecto al PYTHONPATH
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from config import constants
 
 def check_directory(path):
     """Verifica si el path existe y es un directorio."""
@@ -100,7 +105,7 @@ def rename_duplicates(df, column):
             # Si es repetido, incrementar el contador y renombrar
             file_count[file_base_lower] += 1
             new_file_name = f"{file_base}_{file_count[file_base_lower]}{file_ext}"
-            print(new_file_name)
+            #print(new_file_name)
         else:
             # Si es la primera vez que aparece, inicializar el contador
             file_count[file_base_lower] = 0
@@ -177,9 +182,9 @@ def analyze_file(path, carpeta_nombre):
 
     # Guardar los datos transformados en un nuevo archivo CSV
     output_csv = os.path.join(path, "clean_data.csv")
-    transformed_data.to_csv(output_csv)
+    transformed_data.to_csv(output_csv, index=False)
     print(f"\033[92mDatos transformados guardados en '{output_csv}'.\033[0m")
 
 # Ejemplo de uso
-path = "C:/Users/robin/Desktop/Centrosur/RespaldoDomino/ProPru"
+path = constants.PATH
 review_directory(path)

@@ -4,15 +4,8 @@ import json
 import os
 import pandas as pd
 import  time
-# Datos de conexión
-alfresco_url = "http://172.19.154.72:8080/alfresco/api/-default-/public/alfresco/versions/1"
-alfresco_user = "admin"
-alfresco_password = "admin"
 
-#Solución a error 504
-# Definir el tiempo de espera y el número máximo de reintentos
-REQUEST_TIMEOUT = 5  # Tiempo de espera en segundos
-MAX_RETRIES = 3  # Número máximo de reintentos
+from config.constants import ALFRESCO_URL, ALFRESCO_USER, ALFRESCO_PASSWORD, REQUEST_TIMEOUT, MAX_RETRIES
 
 # Función para realizar solicitudes con reintentos
 def make_request(method, url, **kwargs):
@@ -43,13 +36,13 @@ def make_request(method, url, **kwargs):
 def search_folder_by_name(folder_name):
     try:
         # URL para buscar el nombre de la carpeta usando la API de búsqueda
-        url = f"{alfresco_url}/queries/nodes?term={folder_name}&nodeType=cm:folder"
+        url = f"{ALFRESCO_URL}/queries/nodes?term={folder_name}&nodeType=cm:folder"
         headers = {
             "Content-Type": "application/json"
         }
 
         # Realizar la solicitud GET para buscar la carpeta
-        response = make_request(requests.get, url, auth=HTTPBasicAuth(alfresco_user, alfresco_password), headers=headers)
+        response = make_request(requests.get, url, auth=HTTPBasicAuth(ALFRESCO_USER, ALFRESCO_PASSWORD), headers=headers)
         
         if response is not None and response.status_code == 200:
             json_response = response.json()
@@ -75,7 +68,7 @@ def create_main_folder(folder_name):
             return existing_folder_id  # Saltar creación y devolver el ID de la carpeta existente
         
         # URL para crear una nueva carpeta en el nodo raíz
-        url = f"{alfresco_url}/nodes/{parent_node_id}/children"
+        url = f"{ALFRESCO_URL}/nodes/{parent_node_id}/children"
         
         # Datos del nuevo nodo (la carpeta)
         data = {
@@ -88,7 +81,7 @@ def create_main_folder(folder_name):
         }
 
         # Realizar la solicitud POST para crear la carpeta
-        response = make_request(requests.post, url, auth=HTTPBasicAuth(alfresco_user, alfresco_password), headers=headers, data=json.dumps(data))
+        response = make_request(requests.post, url, auth=HTTPBasicAuth(ALFRESCO_USER, ALFRESCO_PASSWORD), headers=headers, data=json.dumps(data))
         
         # Verificar si la solicitud fue exitosa
         if response  is not None  and response.status_code == 201:
@@ -108,13 +101,13 @@ def create_subfolder(parent_id, subfolder_name):
     try:
         # Verificar si la subcarpeta ya existe en el nodo padre
         print("\nCreating subfolder:")
-        search_url = f"{alfresco_url}/queries/nodes?term={subfolder_name}&nodeType=cm:folder"
+        search_url = f"{ALFRESCO_URL}/queries/nodes?term={subfolder_name}&nodeType=cm:folder"
         headers = {
             "Content-Type": "application/json"
         }
 
         # Realizar la solicitud GET para buscar la subcarpeta
-        search_response = make_request(requests.get,search_url, auth=HTTPBasicAuth(alfresco_user, alfresco_password), headers=headers)
+        search_response = make_request(requests.get,search_url, auth=HTTPBasicAuth(ALFRESCO_USER, ALFRESCO_PASSWORD), headers=headers)
         
         if search_response is not None and search_response.status_code == 200:
             json_response = search_response.json()
@@ -126,7 +119,7 @@ def create_subfolder(parent_id, subfolder_name):
                     return node['id']  # Devolver el ID de la carpeta existente
         
         # Si no existe, proceder a crearla
-        create_url = f"{alfresco_url}/nodes/{parent_id}/children"
+        create_url = f"{ALFRESCO_URL}/nodes/{parent_id}/children"
         
         # Datos del nuevo nodo (la subcarpeta)
         data = {
@@ -135,7 +128,7 @@ def create_subfolder(parent_id, subfolder_name):
         }
         
         # Realizar la solicitud POST para crear la subcarpeta
-        create_response = make_request(requests.post, create_url, auth=HTTPBasicAuth(alfresco_user, alfresco_password), headers=headers, data=json.dumps(data))
+        create_response = make_request(requests.post, create_url, auth=HTTPBasicAuth(ALFRESCO_USER, ALFRESCO_PASSWORD), headers=headers, data=json.dumps(data))
         
         # Verificar si la solicitud fue exitosa
         if create_response is not None and create_response.status_code == 201:
@@ -158,13 +151,13 @@ def get_folders(path):
 # Función para verificar si el documento ya existe en la carpeta antes de subirlo
 def document_exists(parent_id, document_name):
     try:
-        search_url = f"{alfresco_url}/queries/nodes?term={document_name}&nodeType=cm:content"
+        search_url = f"{ALFRESCO_URL}/queries/nodes?term={document_name}&nodeType=cm:content"
         headers = {
             "Content-Type": "application/json"
         }
 
         # Realizar la solicitud GET para buscar el documento
-        search_response = make_request(requests.get, search_url, auth=HTTPBasicAuth(alfresco_user, alfresco_password), headers=headers)
+        search_response = make_request(requests.get, search_url, auth=HTTPBasicAuth(ALFRESCO_USER, ALFRESCO_PASSWORD), headers=headers)
         
         if search_response is not None and search_response.status_code == 200:
             json_response = search_response.json()
@@ -197,7 +190,7 @@ def upload_document_to_alfresco(parent_id, file_path):
             return id_search
 
         # URL para subir el documento al nodo padre
-        url = f"{alfresco_url}/nodes/{parent_id}/children"
+        url = f"{ALFRESCO_URL}/nodes/{parent_id}/children"
         
         # Datos para la creación del nodo del archivo
         files = {'filedata': open(file_path, 'rb')}
@@ -206,7 +199,7 @@ def upload_document_to_alfresco(parent_id, file_path):
             'nodeType': 'cm:content'  # Tipo de nodo para archivos
         }
         
-        response = make_request(requests.post, url, auth=HTTPBasicAuth(alfresco_user, alfresco_password), files=files, data=data)
+        response = make_request(requests.post, url, auth=HTTPBasicAuth(ALFRESCO_USER, ALFRESCO_PASSWORD), files=files, data=data)
         
         if response is not None and response.status_code == 201:
             node = response.json()["entry"]
@@ -236,7 +229,7 @@ def process_csv_and_upload_attachments(csv_path, csv_name,  parent_id_alfresco):
             
             if document_id:
                 #print(f"Attachment uploaded: {file_path} (ID: {document_id})\n")
-                url_alfresco = f"{alfresco_url}/nodes/{document_id}?a=true"  # Enlace a Alfresco del documento
+                url_alfresco = f"{ALFRESCO_URL}/nodes/{document_id}?a=true"  # Enlace a Alfresco del documento
                 df.at[index, 'cmpAnexoProc'] = url_alfresco
             else:
                 print(f"Failed to upload: {file_path}\n")
@@ -250,7 +243,7 @@ def main():
     base_folder_path = r"C:\Users\robin\Desktop\Centrosur\RespaldoDomino"  # Cambia esto a tu directorio
     
     # Nombre de la carpeta principal en Alfresco
-    main_folder_name = "DominoVault"  # Cambia el nombre si es necesario
+    main_folder_name = "Test"  # Cambia el nombre si es necesario
 
     # Crear la carpeta principal
     main_folder_id = create_main_folder(main_folder_name)
