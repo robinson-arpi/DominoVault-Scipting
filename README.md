@@ -22,6 +22,36 @@ Situese en la carpeta del proyecto e instale el requirements.txt
 > ```python
 > pip install -r requirements.txt
 > ```
+>
+
+#### Configuración de credenciales
+
+> En config/configurations.ini agregar las  credenciales correspondientes para las conexiones  y directorios:
+>
+> ```
+> # Credenciales para DB2
+> [DATABASE]
+> DRIVER = {iSeries Access ODBC Driver}
+> HOST = xxx.xxx.xxx.xxx
+> DATABASE = DB_NAME
+> UID = DB_USER
+> PWD = DB_PASSWORD
+>
+>
+> #Credenciales para Alfresco
+> [ALFRESCO]
+> URL = ALFRESCO_URL
+> USER = ALFRESCO_USER
+> PASSWORD = ALFRESCO_PASSWORD
+> # Tiempo de espera en segundos
+> REQUEST_TIMEOUT = ALFRESCO_TIMEOUT
+> # Número máximo de reintentos
+> MAX_RETRIES = ALFRESCO_MAX_RETRIES
+>
+>
+> [DIRECTORIES]
+> PATH = PATH_TO_EXTRACT_NSF_DATABASE
+> ```
 
 ## Scripts
 
@@ -37,7 +67,7 @@ Script de python que toma lo extraído con el Agente Java para limpiar y organiz
 
 ### 3. AlfrescoMapping
 
-Script de python que con la data limpia carga al gestor documental Alfresco los archivos adjutnos y vincula el nodo a un nuveo csv.
+Script de python que con la data limpia carga al gestor documental Alfresco los archivos adjutnos y vincula el nodo a un nuevo csv llamado data_vincules_to_alfresco.csv.
 
 ### 4. Db2_mapping
 

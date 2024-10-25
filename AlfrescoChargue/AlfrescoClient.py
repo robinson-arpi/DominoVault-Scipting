@@ -129,7 +129,7 @@ class AlfrescoClient:
             str: ID de la subcarpeta creada o existente, None en caso de error.
         """
         try:
-            print("\nCreating subfolder:")
+            print(f"\nCreating subfolder: {subfolder_name}")
             # URL para buscar la subcarpeta existente
             search_url = f"{self.base_url}/queries/nodes?term={subfolder_name}&nodeType=cm:folder"
             headers = {"Content-Type": "application/json"}
@@ -157,7 +157,7 @@ class AlfrescoClient:
                 node = create_response.json()["entry"]
                 return node['id']
             else:
-                print(f"Error creating subfolder. Status code: {create_response.status_code}")
+                print(f"Error creating subfolder {subfolder_name}. Status code: {create_response.status_code}")
                 print("Response:", create_response.text)
                 return None
         except Exception as e:

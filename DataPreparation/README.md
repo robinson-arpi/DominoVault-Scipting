@@ -69,9 +69,9 @@ Este script en Python está diseñado para procesar archivos CSV que generó el 
 
 El código se ejecuta iterando en todas las carpetas dentro de ProPru
 
-![1729711726209](image/README/1729711726209.png)
+![1729711726209](../Resources/images/data_preparation/1729711726209.png)
 
-En cada carpeta correspondiente a los formularios se creará un csv llamado clean_data.csv![1729713994837](image/README/1729713994837.png)
+En cada carpeta correspondiente a los formularios se creará un csv llamado clean_data.csv![1729713994837](../Resources/images/data_preparation/1729713994837.png)
 
 ## Notas Adicionales
 
