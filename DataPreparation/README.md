@@ -54,7 +54,7 @@ Este script en Python está diseñado para procesar archivos CSV que generó el 
 
 ## Ejemplo de ejecución
 
-> En config/database_config.ini agregar el path con le que se  va a trabajar. Continuando con le ejemplo presentado colocamos el directorio ProPru
+> En config/configurations.ini agregar el path con le que se  va a trabajar. Continuando con le ejemplo presentado colocamos el directorio ProPru
 >
 > ```
 > [DIRECTORIES]

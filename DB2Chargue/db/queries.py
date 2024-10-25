@@ -1,4 +1,4 @@
-from db.connection import DBConnection
+from DB2Chargue.db.connection import DBConnection
 
 class DatabaseManager:
     def __init__(self):

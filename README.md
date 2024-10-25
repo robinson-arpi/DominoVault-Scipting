@@ -22,35 +22,41 @@ Situese en la carpeta del proyecto e instale el requirements.txt
 > ```python
 > pip install -r requirements.txt
 > ```
->
 
 #### Configuración de credenciales
 
 > En config/configurations.ini agregar las  credenciales correspondientes para las conexiones  y directorios:
 >
 > ```
+> #Credenciales para constants.py
+>
 > # Credenciales para DB2
 > [DATABASE]
 > DRIVER = {iSeries Access ODBC Driver}
-> HOST = xxx.xxx.xxx.xxx
-> DATABASE = DB_NAME
-> UID = DB_USER
-> PWD = DB_PASSWORD
+> HOST = XXX.XXXX.XXX.XXX
+> DATABASE = db_name
+> UID = db_user
+> PWD = db_pass
 >
 >
 > #Credenciales para Alfresco
 > [ALFRESCO]
-> URL = ALFRESCO_URL
-> USER = ALFRESCO_USER
-> PASSWORD = ALFRESCO_PASSWORD
+> URL = api_url
+> USER = af_user
+> PASSWORD = af_admin
 > # Tiempo de espera en segundos
-> REQUEST_TIMEOUT = ALFRESCO_TIMEOUT
+> REQUEST_TIMEOUT = 5
 > # Número máximo de reintentos
-> MAX_RETRIES = ALFRESCO_MAX_RETRIES
+> MAX_RETRIES = 3
 >
 >
 > [DIRECTORIES]
-> PATH = PATH_TO_EXTRACT_NSF_DATABASE
+> MAIN_NODE = name_node
+> MAIN_DIRECTORIE = path_directorie
+>
+> #Cambiar path para cada base de datos
+> PATH_FOR_NSF = C:/Users/robin/Desktop/Centrosur/RespaldoDomino/ProPru
+>
 > ```
 
 ## Scripts
@@ -72,6 +78,11 @@ Script de python que con la data limpia carga al gestor documental Alfresco los 
 ### 4. Db2_mapping
 
 Script de python para subir como tabla el csv a base de datos, con el vinculo correspondiente a alfresco.
+
+### Notas
+
+* La carpeta Resources contiene solo imágenes que fueron usadas para crear los diferentes READMEs.
+* En caso de necesitar credenciales extra se puedne agregar en configurations.ini y en constants.py
 
 ## Glosario de términos de lotus domino
 
