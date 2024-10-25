@@ -77,7 +77,7 @@ Script de python que con la data limpia carga al gestor documental Alfresco los 
 
 ### 4. Db2_mapping
 
-Script de python para subir como tabla el csv a base de datos, con el vinculo correspondiente a alfresco.
+Script de python para subir como tabla el csv a base de datos, con el vinculo correspondiente a alfresco (Incompleto, solo realiza conexión a db2).
 
 ### Notas
 
